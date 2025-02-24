@@ -17,6 +17,17 @@ int bg_pids_count = 0;
 volatile sig_atomic_t blocked = false;
 volatile sig_atomic_t ignore_bg = false;
 
+void exit_shell()
+{
+  // Kill all background processes
+  for (int i = 0; i < bg_pids_count; i++)
+  {
+    kill(bg_pids[i], SIGKILL);
+  }
+
+  exit(EXIT_SUCCESS);
+}
+
 void cd(char *path)
 {
   if (!path)
@@ -179,7 +190,8 @@ int main()
     // Handle built-in command "exit"
     if (!strcmp(curr_command->argv[0], "exit"))
     {
-      break;
+      free_command(curr_command);
+      exit_shell();
     }
 
     // Handle built-in command "cd"
